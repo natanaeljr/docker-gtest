@@ -19,6 +19,7 @@ ARMBuild:
   script:
     - make TARGET=armhf
   tags:
+    - docker
     - armhf
 
 IntelBuild:
@@ -26,6 +27,7 @@ IntelBuild:
   script:
     - make TARGET=x86_64
   tags:
+    - docker
     - x86_64
 
 ARMDeploy:
@@ -35,6 +37,7 @@ ARMDeploy:
   only:
     - master
   tags:
+    - docker
     - armhf
 
 IntelDeploy:
@@ -44,4 +47,5 @@ IntelDeploy:
   only:
     - master
   tags:
+    - docker
     - x86_64
