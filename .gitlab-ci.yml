@@ -1,0 +1,47 @@
+image: docker:stable
+
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - docker info
+
+ARMBuild:
+  stage: build
+  script:
+    - make TARGET=armhf
+  tags:
+    - armhf
+
+IntelBuild:
+  stage: build
+  script:
+    - make TARGET=x86_64
+  tags:
+    - x86_64
+
+ARMDeploy:
+  stage: deploy
+  script:
+    - docker push username/project:armhf-latest
+  only:
+    - master
+  tags:
+    - armhf
+
+IntelDeploy:
+  stage: deploy
+  script:
+    - docker push username/project:x86_64-latest
+  only:
+    - master
+  tags:
+    - x86_64

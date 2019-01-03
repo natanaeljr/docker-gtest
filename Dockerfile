@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM multiarch/ubuntu-core:architecture
 
 RUN apt-get update
 RUN apt-get install -y g++ cmake libgtest-dev
