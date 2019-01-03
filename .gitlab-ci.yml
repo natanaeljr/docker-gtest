@@ -18,17 +18,11 @@ ARMBuild:
   stage: build
   script:
     - make TARGET=armhf
-  tags:
-    - docker
-    - armhf
 
 IntelBuild:
   stage: build
   script:
     - make TARGET=x86_64
-  tags:
-    - docker
-    - x86_64
 
 ARMDeploy:
   stage: deploy
@@ -36,9 +30,6 @@ ARMDeploy:
     - docker push username/project:armhf-latest
   only:
     - master
-  tags:
-    - docker
-    - armhf
 
 IntelDeploy:
   stage: deploy
@@ -46,6 +37,3 @@ IntelDeploy:
     - docker push username/project:x86_64-latest
   only:
     - master
-  tags:
-    - docker
-    - x86_64
