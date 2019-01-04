@@ -34,15 +34,13 @@ IntelBuild:
 ARMDeploy:
   stage: deploy
   script:
-    - true
-    #- docker push username/project:armhf-latest
+    - echo TODO
   only:
     - master
 
 IntelDeploy:
   stage: deploy
   script:
-    - true
-    #- docker push username/project:x86_64-latest
+    - echo TODO
   only:
     - master
