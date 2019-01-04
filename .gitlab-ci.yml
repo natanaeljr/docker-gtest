@@ -1,11 +1,11 @@
 image: docker:stable
 
+services:
+  - docker:dind
+
 variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
-
-services:
-  - docker:dind
 
 stages:
   - build
@@ -15,27 +15,34 @@ before_script:
   - apk update
   - apk add make
   - docker info
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
 ARMBuild:
   stage: build
   script:
     - make TARGET=armhf
+    - docker tag natanaeljr/gtest:armhf-$CI_COMMIT_REF_SLUG $CI_REGISTRY_IMAGE/ubuntu-gtest:armhf-$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE/ubuntu-gtest:armhf-$CI_COMMIT_REF_SLUG
 
 IntelBuild:
   stage: build
   script:
     - make TARGET=x86_64
+    - docker tag natanaeljr/gtest:x86_64-$CI_COMMIT_REF_SLUG $CI_REGISTRY_IMAGE/ubuntu-gtest:armhf-$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE/ubuntu-gtest:x86_64-$CI_COMMIT_REF_SLUG
 
 ARMDeploy:
   stage: deploy
   script:
-    - docker push username/project:armhf-latest
+    - true
+    #- docker push username/project:armhf-latest
   only:
     - master
 
 IntelDeploy:
   stage: deploy
   script:
-    - docker push username/project:x86_64-latest
+    - true
+    #- docker push username/project:x86_64-latest
   only:
     - master
