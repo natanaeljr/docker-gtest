@@ -13,6 +13,7 @@ dpkg -s libgtest-dev
 pushd $(pwd)
 
 # Build GoogleTest
+ls /usr/src/
 cd /usr/src/googletest
 cmake CMakeLists.txt
 make

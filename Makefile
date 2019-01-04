@@ -5,10 +5,10 @@ build: tmp-$(TARGET)/Dockerfile
 	docker run --rm natanaeljr/gtest:$(TARGET)-latest uname -a
 
 
-tmp-$(TARGET)/Dockerfile: Dockerfile $@
+tmp-$(TARGET)/Dockerfile: Makefile Dockerfile $@
 	rm -rf tmp-$(TARGET)
 	mkdir tmp-$(TARGET)
 	cp Dockerfile $@
 	cp setup-gtest.sh tmp-$(TARGET)
-	sed -i "1s/architecture/$(TARGET)-xenial/" $@
+	sed -i "1s/architecture/$(TARGET)-bionic/" $@
 	cat $@
