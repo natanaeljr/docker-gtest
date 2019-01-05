@@ -10,9 +10,9 @@ stages:
 variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
-  CONTAINER_TAG: $TARGET-$CI_COMMIT_SHORT_SHA
+  CONTAINER_TAG: $TARGET_ARCH-$CI_COMMIT_SHORT_SHA
   CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
-  CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.ubuntu-gtest.$TARGET-$CONTAINER_TAG.tar
+  CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.ubuntu-gtest.$TARGET_ARCH-$CONTAINER_TAG.tar
 
 before_script:
   - apk update
@@ -25,9 +25,11 @@ before_script:
 ## Build Image template
 .build:
   stage: build
+  variables:
+    CACHE_FROM: $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
   script: 
-    - docker pull $CI_REGISTRY/$CONTAINER_IMAGE:$CONTAINER_TAG || true
-    - make TARGET=$TARGET CACHE_FROM=$CI_REGISTRY/$CONTAINER_IMAGE:$CONTAINER_TAG
+    - docker pull $CACHE_FROM || true
+    - make build
     - docker save --output $CONTAINER_TAR_FILE $CONTAINER_IMAGE:$CONTAINER_TAG
   artifacts:
     paths:
@@ -35,18 +37,18 @@ before_script:
     expire_in: 1 day
   only:
     variables:
-      - $TARGET
+      - $TARGET_ARCH
 
 ## Deploy Image template
 .deploy:
   stage: deploy
   script:
     - docker load --input $CONTAINER_TAR_FILE
-    - docker tag $CONTAINER_IMAGE:$CONTAINER_TAG $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET-latest
-    - docker push $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET-latest
+    - docker tag $CONTAINER_IMAGE:$CONTAINER_TAG $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
+    - docker push $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
   only:
     variables:
-      - $TARGET
+      - $TARGET_ARCH
     refs:
       - master
 
@@ -56,12 +58,12 @@ before_script:
 build:x86_64:
   extends: .build
   variables:
-    TARGET: x86_64
+    TARGET_ARCH: x86_64
 
 deploy:x86_64:
   extends: .deploy
   variables:
-    TARGET: x86_64
+    TARGET_ARCH: x86_64
   dependencies:
     - build:x86_64
 
@@ -71,12 +73,12 @@ deploy:x86_64:
 build:armhf:
   extends: .build
   variables:
-    TARGET: armhf
+    TARGET_ARCH: armhf
 
 deploy:armhf:
   extends: .deploy
   variables:
-    TARGET: armhf
+    TARGET_ARCH: armhf
   dependencies:
     - build:armhf
 
