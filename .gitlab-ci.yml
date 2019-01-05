@@ -10,9 +10,10 @@ stages:
 variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
-  CONTAINER_TAG: ${TARGET_ARCH}-${CI_COMMIT_SHORT_SHA}
+  CONTAINER_TAG: $TARGET_ARCH.$CI_COMMIT_SHORT_SHA
   CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
   CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.ubuntu-gtest.$CONTAINER_TAG.tar
+  CONTAINER_CACHE_FROM:
 
 before_script:
   - apk update
@@ -25,10 +26,9 @@ before_script:
 ## Build Image template
 .build:
   stage: build
-  variables:
-    CACHE_FROM: $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
   script: 
-    - docker pull $CACHE_FROM || true
+    - export CACHE_FROM=$CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
+    - docker pull $CACHE_FROM || echo "docker pull failed, ignoring."
     - make build
     - docker save --output $CONTAINER_TAR_FILE $CONTAINER_IMAGE:$CONTAINER_TAG
   artifacts:
@@ -44,8 +44,8 @@ before_script:
   stage: deploy
   script:
     - docker load --input $CONTAINER_TAR_FILE
-    - docker tag $CONTAINER_IMAGE:$CONTAINER_TAG $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
-    - docker push $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
+    - docker tag $CONTAINER_IMAGE:$CONTAINER_TAG $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH.latest
+    - docker push $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH.latest
   only:
     variables:
       - $TARGET_ARCH
