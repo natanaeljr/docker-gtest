@@ -13,7 +13,7 @@ variables:
   CONTAINER_TAG: $TARGET_ARCH.$CI_COMMIT_SHORT_SHA
   CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
   CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.ubuntu-gtest.$CONTAINER_TAG.tar
-  CONTAINER_CACHE_FROM:
+  CONTAINER_CACHE_FROM: $CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
 
 before_script:
   - apk update
@@ -27,8 +27,7 @@ before_script:
 .build:
   stage: build
   script: 
-    - export CACHE_FROM=$CI_REGISTRY/$CONTAINER_IMAGE:$TARGET_ARCH-latest
-    - docker pull $CACHE_FROM || echo "docker pull failed, ignoring."
+    - docker pull $CONTAINER_CACHE_FROM || echo "docker pull failed, ignoring."
     - make build
     - docker save --output $CONTAINER_TAR_FILE $CONTAINER_IMAGE:$CONTAINER_TAG
   artifacts:
