@@ -1,11 +1,11 @@
 TARGET_ARCH ?= x86_64
 CONTAINER_TAG ?= latest
 CONTAINER_IMAGE ?= natanaeljr/gtest
-CONTATINER_CACHE_FROM ?=
+CONTAINER_CACHE_FROM ?=
 
 
 build: build-$(TARGET_ARCH)/Dockerfile
-	docker build $(CONTATINER_CACHE_FROM:%=--cache-from %) -t $(CONTAINER_IMAGE):$(TARGET_ARCH)-$(CONTAINER_TAG) build-$(TARGET_ARCH)
+	docker build $(CONTAINER_CACHE_FROM:%=--cache-from %) -t $(CONTAINER_IMAGE):$(TARGET_ARCH)-$(CONTAINER_TAG) build-$(TARGET_ARCH)
 	docker run --rm $(CONTAINER_IMAGE):$(TARGET_ARCH)-$(CONTAINER_TAG) uname -a
 
 
