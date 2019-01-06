@@ -2,7 +2,8 @@ image: docker:stable
 
 services:
   - name: docker:dind
-    command: ["--experimental"]
+    command: 
+      - --experimental
 
 stages:
   - build
@@ -15,7 +16,7 @@ variables:
   CONTAINER_TAG: ci$CI_PIPELINE_ID
   CONTAINER_IMAGE: $CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
   CONTAINER_TAR_FILE: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.ubuntu-gtest.$TARGET_ARCH-ci$CI_PIPELINE_ID.tar
-  CONTAINER_CACHE_FROM: $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest:$TARGET_ARCH-latest
+  CONTAINER_CACHE_FROM: $CI_REGISTRY_IMAGE/ubuntu-gtest:$TARGET_ARCH-latest
 
 before_script:
   - printenv
@@ -88,19 +89,14 @@ deploy:armhf:
 
 manifest:
   stage: registry
-  before_script:
-    - printenv
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - export DOCKER_CLI_EXPERIMENTAL=enabled
-    - docker info
   script:
-    - export REGISTRY_IMAGE=$CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
-    - docker manifest create $REGISTRY_IMAGE:latest
+    - export DOCKER_CLI_EXPERIMENTAL=enabled
+    - docker manifest create $CI_REGISTRY_IMAGE/ubuntu-gtest:latest
         $REGISTRY_IMAGE:x86_64-latest
         $REGISTRY_IMAGE:armhf-latest
-    - docker manifest annotate $REGISTRY_IMAGE:latest $REGISTRY_IMAGE:x86_64-latest --arch amd64 --os linux
-    - docker manifest annotate $REGISTRY_IMAGE:latest $REGISTRY_IMAGE:armhf-latest --arch arm --os linux
-    - docker manifest push $REGISTRY_IMAGE:latest
+    - docker manifest annotate $CI_REGISTRY_IMAGE/ubuntu-gtest:latest $CI_REGISTRY_IMAGE/ubuntu-gtest:x86_64-latest --arch amd64 --os linux
+    - docker manifest annotate $CI_REGISTRY_IMAGE/ubuntu-gtest:latest $CI_REGISTRY_IMAGE/ubuntu-gtest:armhf-latest --arch arm --os linux
+    - docker manifest push $CI_REGISTRY_IMAGE/ubuntu-gtest:latest
   dependencies: []
   only:
     refs:
