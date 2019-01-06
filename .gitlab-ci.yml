@@ -1,11 +1,13 @@
 image: docker:stable
 
 services:
-  - docker:dind
+  - name: docker:dind
+    command: ["--experimental"]
 
 stages:
   - build
   - deploy
+  - registry
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
@@ -82,3 +84,18 @@ deploy:armhf:
   dependencies:
     - build:armhf
 
+###################################################################################################
+
+manifest:
+  stage: registry
+  script:
+    - export REGISTRY_IMAGE=$CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
+    - docker manifest create $REGISTRY_IMAGE:latest \
+        $REGISTRY_IMAGE:x86_64-latest \
+        $REGISTRY_IMAGE:armhf-latest
+    - docker manifest annotate $REGISTRY_IMAGE:x86_64-latest --arch amd64 --os Linux
+    - docker manifest annotate $REGISTRY_IMAGE:armhf-latest --arch arm --os Linux
+    - docker manifest push $REGISTRY_IMAGE:latest
+  only:
+    refs:
+      - master
