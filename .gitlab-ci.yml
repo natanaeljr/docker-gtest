@@ -98,8 +98,8 @@ manifest:
     - docker manifest create $REGISTRY_IMAGE:latest
         $REGISTRY_IMAGE:x86_64-latest
         $REGISTRY_IMAGE:armhf-latest
-    - docker manifest annotate $REGISTRY_IMAGE:latest $REGISTRY_IMAGE:x86_64-latest --arch amd64 --os Linux
-    - docker manifest annotate $REGISTRY_IMAGE:latest $REGISTRY_IMAGE:armhf-latest --arch arm --os Linux
+    - docker manifest annotate $REGISTRY_IMAGE:latest $REGISTRY_IMAGE:x86_64-latest --arch amd64 --os linux
+    - docker manifest annotate $REGISTRY_IMAGE:latest $REGISTRY_IMAGE:armhf-latest --arch arm --os linux
     - docker manifest push $REGISTRY_IMAGE:latest
   dependencies: []
   only:
