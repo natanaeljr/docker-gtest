@@ -101,7 +101,7 @@ manifest:
     - docker manifest annotate $REGISTRY_IMAGE:x86_64-latest --arch amd64 --os Linux
     - docker manifest annotate $REGISTRY_IMAGE:armhf-latest --arch arm --os Linux
     - docker manifest push $REGISTRY_IMAGE:latest
-  dependencies: {}
+  dependencies: []
   only:
     refs:
       - master
