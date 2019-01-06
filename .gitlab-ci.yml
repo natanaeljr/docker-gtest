@@ -92,8 +92,8 @@ manifest:
   script:
     - export DOCKER_CLI_EXPERIMENTAL=enabled
     - docker manifest create $CI_REGISTRY_IMAGE/ubuntu-gtest:latest
-        $REGISTRY_IMAGE:x86_64-latest
-        $REGISTRY_IMAGE:armhf-latest
+        $CI_REGISTRY_IMAGE:x86_64-latest
+        $CI_REGISTRY_IMAGE:armhf-latest
     - docker manifest annotate $CI_REGISTRY_IMAGE/ubuntu-gtest:latest $CI_REGISTRY_IMAGE/ubuntu-gtest:x86_64-latest --arch amd64 --os linux
     - docker manifest annotate $CI_REGISTRY_IMAGE/ubuntu-gtest:latest $CI_REGISTRY_IMAGE/ubuntu-gtest:armhf-latest --arch arm --os linux
     - docker manifest push $CI_REGISTRY_IMAGE/ubuntu-gtest:latest
