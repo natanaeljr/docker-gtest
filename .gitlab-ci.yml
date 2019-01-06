@@ -95,8 +95,8 @@ manifest:
     - docker info
   script:
     - export REGISTRY_IMAGE=$CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/ubuntu-gtest
-    - docker manifest create $REGISTRY_IMAGE:latest \
-        $REGISTRY_IMAGE:x86_64-latest \
+    - docker manifest create $REGISTRY_IMAGE:latest
+        $REGISTRY_IMAGE:x86_64-latest
         $REGISTRY_IMAGE:armhf-latest
     - docker manifest annotate $REGISTRY_IMAGE:x86_64-latest --arch amd64 --os Linux
     - docker manifest annotate $REGISTRY_IMAGE:armhf-latest --arch arm --os Linux
