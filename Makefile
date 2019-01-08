@@ -3,7 +3,7 @@ CONTAINER_TAG ?= latest
 CONTAINER_IMAGE ?= natanaeljr/gtest
 CONTAINER_CACHE_FROM ?=
 
-.PHONY: build
+.PHONY: build test
 
 build: build/$(TARGET_ARCH)/Dockerfile
 	docker build $(CONTAINER_CACHE_FROM:%=--cache-from %) -t $(CONTAINER_IMAGE):$(TARGET_ARCH)-$(CONTAINER_TAG) build/$(TARGET_ARCH)
@@ -16,3 +16,6 @@ build/$(TARGET_ARCH)/Dockerfile: Makefile Dockerfile $@
 	sed -i "1s/architecture/$(TARGET_ARCH)-bionic/" $@
 	cat $@
 
+test:
+	docker run --name test --rm -v "$(shell pwd)/test":/app $(CONTAINER_IMAGE):$(TARGET_ARCH)-$(CONTAINER_TAG) \
+		bin/sh -c "cd app && ./run_test.sh"

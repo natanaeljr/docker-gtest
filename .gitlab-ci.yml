@@ -7,8 +7,9 @@ services:
 
 stages:
   - build
+  - test
   - deploy
-  - registry
+  - register
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
@@ -42,6 +43,16 @@ before_script:
     variables:
       - $TARGET_ARCH
 
+## Test Image template
+.test:
+  stage: test
+  script:
+    - docker load --input $CONTAINER_TAR_FILE
+    - make test
+  only:
+    variables:
+      - $TARGET_ARCH
+
 ## Deploy Image template
 .deploy:
   stage: deploy
@@ -63,12 +74,19 @@ build:x86_64:
   variables:
     TARGET_ARCH: x86_64
 
+test:x86_64:
+  extends: .test
+  variables:
+    TARGET_ARCH: x86_64
+  dependencies:
+    - build:x86_64
+
 deploy:x86_64:
   extends: .deploy
   variables:
     TARGET_ARCH: x86_64
   dependencies:
-    - build:x86_64
+    - test:x86_64
 
 ###################################################################################################
 
@@ -78,17 +96,24 @@ build:armhf:
   variables:
     TARGET_ARCH: armhf
 
-deploy:armhf:
-  extends: .deploy
+test:armhf:
+  extends: .test
   variables:
     TARGET_ARCH: armhf
   dependencies:
     - build:armhf
 
+deploy:armhf:
+  extends: .deploy
+  variables:
+    TARGET_ARCH: armhf
+  dependencies:
+    - test:armhf
+
 ###################################################################################################
 
 manifest:
-  stage: registry
+  stage: register
   script:
     - export DOCKER_CLI_EXPERIMENTAL=enabled
     - docker manifest create $CI_REGISTRY_IMAGE/ubuntu-gtest:latest
