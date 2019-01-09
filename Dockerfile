@@ -6,4 +6,4 @@ RUN apt-get install -y g++ cmake libgtest-dev
 RUN cd /usr/src/googletest \
 	&& cmake CMakeLists.txt \
 	&& make all \
-    && make install
+	&& make install
